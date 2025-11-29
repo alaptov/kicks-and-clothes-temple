@@ -60,6 +60,7 @@ services:
       STRIPE_API_KEY: ${STRIPE_API_KEY}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
       PAYSTACK_SECRET_KEY: ${PAYSTACK_SECRET_KEY}
+      DISABLE_ADMIN: "true"
     ports:
       - "9000:9000"
     networks:

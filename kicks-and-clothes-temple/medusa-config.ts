@@ -3,6 +3,10 @@ import { loadEnv, defineConfig, Modules } from '@medusajs/framework/utils'
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
 module.exports = defineConfig({
+  admin: {
+    // Disable admin UI in production if DISABLE_ADMIN is set
+    disable: process.env.DISABLE_ADMIN === "true",
+  },
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
     redisUrl: process.env.REDIS_URL,
