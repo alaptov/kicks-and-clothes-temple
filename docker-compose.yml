@@ -1,0 +1,131 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: kc-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-medusa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-medusa_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-medusa_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - kc-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-medusa} -d ${POSTGRES_DB:-medusa_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: kc-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - kc-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Medusa Backend
+  medusa:
+    build:
+      context: ./kicks-and-clothes-temple
+      dockerfile: Dockerfile
+    container_name: kc-medusa
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://${POSTGRES_USER:-medusa}:${POSTGRES_PASSWORD:-medusa_secret}@postgres:5432/${POSTGRES_DB:-medusa_db}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      COOKIE_SECRET: ${COOKIE_SECRET}
+      STORE_CORS: ${STORE_CORS}
+      ADMIN_CORS: ${ADMIN_CORS}
+      AUTH_CORS: ${AUTH_CORS}
+      STRIPE_API_KEY: ${STRIPE_API_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      PAYSTACK_SECRET_KEY: ${PAYSTACK_SECRET_KEY}
+    ports:
+      - "9000:9000"
+    networks:
+      - kc-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9000/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+
+  # Next.js Storefront
+  storefront:
+    build:
+      context: ./kicks-and-clothes-temple-storefront
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_MEDUSA_BACKEND_URL: ${NEXT_PUBLIC_MEDUSA_BACKEND_URL:-http://medusa:9000}
+        NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL}
+        NEXT_PUBLIC_DEFAULT_REGION: ${NEXT_PUBLIC_DEFAULT_REGION:-gh}
+        NEXT_PUBLIC_PAYSTACK_KEY: ${NEXT_PUBLIC_PAYSTACK_KEY}
+        NEXT_PUBLIC_STRIPE_KEY: ${NEXT_PUBLIC_STRIPE_KEY}
+    container_name: kc-storefront
+    restart: unless-stopped
+    depends_on:
+      medusa:
+        condition: service_healthy
+    environment:
+      MEDUSA_BACKEND_URL: http://medusa:9000
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET}
+    ports:
+      - "8000:8000"
+    networks:
+      - kc-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+  # Nginx Reverse Proxy (optional - for SSL termination)
+  nginx:
+    image: nginx:alpine
+    container_name: kc-nginx
+    restart: unless-stopped
+    depends_on:
+      - medusa
+      - storefront
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/certbot:/var/www/certbot:ro
+    networks:
+      - kc-network
+    profiles:
+      - production
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  kc-network:
+    driver: bridge
