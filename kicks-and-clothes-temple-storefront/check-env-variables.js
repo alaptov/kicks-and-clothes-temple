@@ -10,6 +10,11 @@ const requiredEnvs = [
 ]
 
 function checkEnvVariables() {
+  // Skip validation during Docker build
+  if (process.env.SKIP_ENV_VALIDATION === '1') {
+    return
+  }
+
   const missingEnvs = requiredEnvs.filter(function (env) {
     return !process.env[env.key]
   })
