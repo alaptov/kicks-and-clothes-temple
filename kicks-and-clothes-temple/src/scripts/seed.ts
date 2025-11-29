@@ -394,8 +394,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
         { region_id: regions.ghana.id, amount: 2000 },
       ],
       rules: [
-        { attribute: "enabled_in_store", value: "true", operator: "eq" },
-        { attribute: "is_return", value: "false", operator: "eq" },
+        { attribute: "enabled_in_store", value: "true", operator: "eq" as const },
+        { attribute: "is_return", value: "false", operator: "eq" as const },
       ],
     },
     {
@@ -410,8 +410,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
         { region_id: regions.ghana.id, amount: 5000 },
       ],
       rules: [
-        { attribute: "enabled_in_store", value: "true", operator: "eq" },
-        { attribute: "is_return", value: "false", operator: "eq" },
+        { attribute: "enabled_in_store", value: "true", operator: "eq" as const },
+        { attribute: "is_return", value: "false", operator: "eq" as const },
       ],
     },
     // US shipping
@@ -429,8 +429,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
         { region_id: regions.canada.id, amount: 1400 },
       ],
       rules: [
-        { attribute: "enabled_in_store", value: "true", operator: "eq" },
-        { attribute: "is_return", value: "false", operator: "eq" },
+        { attribute: "enabled_in_store", value: "true", operator: "eq" as const },
+        { attribute: "is_return", value: "false", operator: "eq" as const },
       ],
     },
     {
@@ -447,8 +447,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
         { region_id: regions.canada.id, amount: 3500 },
       ],
       rules: [
-        { attribute: "enabled_in_store", value: "true", operator: "eq" },
-        { attribute: "is_return", value: "false", operator: "eq" },
+        { attribute: "enabled_in_store", value: "true", operator: "eq" as const },
+        { attribute: "is_return", value: "false", operator: "eq" as const },
       ],
     },
     // Europe shipping
@@ -466,8 +466,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
         { region_id: regions.uk.id, amount: 900 },
       ],
       rules: [
-        { attribute: "enabled_in_store", value: "true", operator: "eq" },
-        { attribute: "is_return", value: "false", operator: "eq" },
+        { attribute: "enabled_in_store", value: "true", operator: "eq" as const },
+        { attribute: "is_return", value: "false", operator: "eq" as const },
       ],
     },
     {
@@ -484,8 +484,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
         { region_id: regions.uk.id, amount: 1800 },
       ],
       rules: [
-        { attribute: "enabled_in_store", value: "true", operator: "eq" },
-        { attribute: "is_return", value: "false", operator: "eq" },
+        { attribute: "enabled_in_store", value: "true", operator: "eq" as const },
+        { attribute: "is_return", value: "false", operator: "eq" as const },
       ],
     },
     // Africa shipping
@@ -503,8 +503,8 @@ export default async function seedDemoData({ container }: ExecArgs) {
         { region_id: regions.southAfrica.id, amount: 20000 },
       ],
       rules: [
-        { attribute: "enabled_in_store", value: "true", operator: "eq" },
-        { attribute: "is_return", value: "false", operator: "eq" },
+        { attribute: "enabled_in_store", value: "true", operator: "eq" as const },
+        { attribute: "is_return", value: "false", operator: "eq" as const },
       ],
     },
   ];

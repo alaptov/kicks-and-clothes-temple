@@ -18,8 +18,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build Medusa (ignore TS warnings)
-RUN npm run build || true
+# Build Medusa
+RUN npm run build
 
 # Production image
 FROM base AS runner
