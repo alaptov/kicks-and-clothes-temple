@@ -39,7 +39,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV SKIP_ENV_VALIDATION=1
 
 # Build Next.js
-RUN npm run build 2>&1 || (echo "Build had issues but continuing..." && mkdir -p .next/standalone .next/static && touch .next/standalone/server.js)
+RUN npm run build
 
 # Production image
 FROM base AS runner
